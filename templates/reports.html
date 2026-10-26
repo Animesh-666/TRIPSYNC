@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics & Reports — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle small fw-bold">
+                <i class="bi bi-shield-lock-fill me-1"></i>ADMINISTRATOR EXCLUSIVE
+            </span>
+        </div>
+        <h1 class="page-title">Executive Reports & Data Analytics</h1>
+        <p class="page-subtitle">Aggregated metrics, booking distributions, and payment reconciliation derived directly from Cloud Firestore.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('export_csv') }}" class="btn btn-primary-teal d-inline-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            <span>Export Full CSV Dataset</span>
+        </a>
+    </div>
+</div>
+
+<!-- Financial Accounting Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="card-custom p-4">
+            <div class="text-muted small text-uppercase fw-bold">Active Booking Value</div>
+            <div class="fs-2 fw-bold text-navy mt-1">{{ metrics.formatted_active_value }}</div>
+            <div class="text-muted small mt-2">Sum of all non-cancelled reservation values.</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card-custom p-4">
+            <div class="text-muted small text-uppercase fw-bold text-success">Total Collections Recorded</div>
+            <div class="fs-2 fw-bold text-success mt-1">{{ metrics.formatted_recorded_payments }}</div>
+            <div class="text-muted small mt-2">Total payments collected across all records.</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card-custom p-4">
+            <div class="text-muted small text-uppercase fw-bold text-warning">Active Pending Receivables</div>
+            <div class="fs-2 fw-bold text-warning mt-1">{{ metrics.formatted_outstanding_balance }}</div>
+            <div class="text-muted small mt-2">Outstanding balances on active trips.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Grid -->
+<div class="row g-4 mb-4">
+    <!-- Category Distribution -->
+    <div class="col-12 col-lg-6">
+        <div class="card-custom h-100">
+            <div class="card-header-clean">
+                <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-pie-chart text-primary-teal"></i>
+                    <span>Bookings by Category</span>
+                </span>
+                <span class="badge bg-light text-muted border">Active Only</span>
+            </div>
+            <div class="card-body-clean">
+                <div style="height: 280px; position: relative;">
+                    <canvas id="categoryDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Status Breakdown -->
+    <div class="col-12 col-lg-6">
+        <div class="card-custom h-100">
+            <div class="card-header-clean">
+                <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-wallet2 text-primary-teal"></i>
+                    <span>Payment Status Distribution</span>
+                </span>
+                <span class="badge bg-light text-muted border">Active Bookings</span>
+            </div>
+            <div class="card-body-clean">
+                <div style="height: 280px; position: relative;">
+                    <canvas id="paymentStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Trends (Last Six Calendar Months, Active Bookings Only) -->
+    <div class="col-12">
+        <div class="card-custom">
+            <div class="card-header-clean">
+                <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-graph-up-arrow text-primary-teal"></i>
+                    <span>Bookings Created per Month</span>
+                </span>
+                <span class="badge bg-light text-muted border">Last 6 Months · Active Only</span>
+            </div>
+            <div class="card-body-clean">
+                <div style="height: 270px; position: relative;">
+                    <canvas id="monthlyBookingsChart" aria-label="Active bookings created per month"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Destinations -->
+    <div class="col-12">
+        <div class="card-custom">
+            <div class="card-header-clean">
+                <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-bar-chart-steps text-primary-teal"></i>
+                    <span>Top Indian Travel Destinations</span>
+                </span>
+            </div>
+            <div class="card-body-clean">
+                <div style="height: 260px; position: relative;">
+                    <canvas id="topDestinationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+    window.CHART_CATEGORY_DATA = {{ metrics.category_counts | tojson | safe }};
+    window.CHART_PAYMENT_DATA = {{ metrics.payment_status_counts | tojson | safe }};
+    window.CHART_DESTINATION_DATA = {{ metrics.top_destinations | tojson | safe }};
+    window.CHART_MONTHLY_LABELS = {{ metrics.monthly_labels | tojson }};
+    window.CHART_MONTHLY_COUNTS = {{ metrics.monthly_booking_counts | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

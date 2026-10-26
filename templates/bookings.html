@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}All Bookings — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h1 class="page-title">Booking Records</h1>
+        <p class="page-subtitle">Showing <strong>{{ total_records }}</strong> matching record{{ 's' if total_records != 1 else '' }}. Manage, filter, and track reservations.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('export_csv', **query_params) }}" class="btn btn-outline-slate d-inline-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                <span class="d-none d-sm-inline">Export CSV</span>
+            </a>
+        {% endif %}
+        <a href="{{ url_for('add_booking') }}" class="btn btn-primary-teal d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Booking</span>
+        </a>
+    </div>
+</div>
+
+<!-- Search, Filter & Sort Controls Card -->
+<div class="card-custom mb-4">
+    <div class="card-body-clean p-3">
+        <form id="bookings-filter-form" method="GET" action="{{ url_for('bookings') }}">
+            <div class="row g-2 align-items-center">
+                <!-- Search Input -->
+                <div class="col-12 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control form-control-custom border-start-0" name="q" value="{{ search_query }}" placeholder="Search ID, customer, destination, contact...">
+                    </div>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="col-6 col-md-2">
+                    <select class="form-select form-select-custom" name="category" data-auto-submit>
+                        <option value="all" {% if category == 'all' %}selected{% endif %}>All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>
+                                {{ category_labels[cat] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Booking Status Filter -->
+                <div class="col-6 col-md-2">
+                    <select class="form-select form-select-custom" name="status" data-auto-submit>
+                        <option value="all" {% if status == 'all' %}selected{% endif %}>All Statuses</option>
+                        {% for stat in booking_statuses %}
+                            <option value="{{ stat }}" {% if status == stat %}selected{% endif %}>{{ stat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Payment Status Filter -->
+                <div class="col-6 col-md-2">
+                    <select class="form-select form-select-custom" name="payment" data-auto-submit>
+                        <option value="all" {% if payment == 'all' %}selected{% endif %}>All Payments</option>
+                        {% for p_stat in payment_statuses %}
+                            <option value="{{ p_stat }}" {% if payment == p_stat %}selected{% endif %}>{{ p_stat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sort By -->
+                <div class="col-6 col-md-2">
+                    <select class="form-select form-select-custom" name="sort_by" data-auto-submit>
+                        <option value="travel_date" {% if sort_by == 'travel_date' %}selected{% endif %}>Sort: Travel Date</option>
+                        <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Sort: Created Date</option>
+                        <option value="customer_name" {% if sort_by == 'customer_name' %}selected{% endif %}>Sort: Customer Name</option>
+                        <option value="total_amount" {% if sort_by == 'total_amount' %}selected{% endif %}>Sort: Total Amount</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Advanced Filters Drawer / Second Row -->
+            <div class="row g-2 mt-2 pt-2 border-top align-items-center">
+                <div class="col-12 col-sm-4 col-md-3">
+                    <select class="form-select form-select-custom" name="destination" data-auto-submit>
+                        <option value="all" {% if destination == 'all' %}selected{% endif %}>All Destinations</option>
+                        {% for city in standard_destinations %}
+                            <option value="{{ city }}" {% if destination == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-6 col-sm-3 col-md-2">
+                    <input type="date" class="form-control form-control-custom" name="start_date" value="{{ start_date }}" placeholder="From date">
+                </div>
+
+                <div class="col-6 col-sm-3 col-md-2">
+                    <input type="date" class="form-control form-control-custom" name="end_date" value="{{ end_date }}" placeholder="To date">
+                </div>
+
+                <div class="col-6 col-sm-2 col-md-2">
+                    <select class="form-select form-select-custom" name="sort_dir" data-auto-submit>
+                        <option value="asc" {% if sort_dir == 'asc' %}selected{% endif %}>Ascending</option>
+                        <option value="desc" {% if sort_dir == 'desc' %}selected{% endif %}>Descending</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-sm-12 col-md-3 d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary-teal btn-sm px-3">
+                        <i class="bi bi-filter me-1"></i>Filter
+                    </button>
+                    <a href="{{ url_for('bookings') }}" id="reset-filters-btn" class="btn btn-outline-slate btn-sm">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bookings Data Table Card -->
+<div class="card-custom">
+    <div class="card-body-clean p-0">
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Customer</th>
+                            <th>Category</th>
+                            <th>Destination</th>
+                            <th>Date / Countdown</th>
+                            <th>Total (INR)</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('booking_details', booking_id=b.booking_id) }}" class="booking-code text-decoration-none">
+                                        {{ b.booking_id }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-navy">{{ b.customer_name }}</div>
+                                    <div class="text-muted small"><i class="bi bi-telephone me-1"></i>{{ b.contact }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge-custom badge-{{ b.travel_type }}">
+                                        <i class="bi {{ category_icons.get(b.travel_type, 'bi-tag') }}"></i>
+                                        {{ b.travel_type | capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">{{ b.destination }}</div>
+                                    {% if b.travel_type == 'hotel' and b.hotel_name %}
+                                        <div class="text-muted small text-truncate" style="max-width: 140px;">{{ b.hotel_name }}</div>
+                                    {% elif b.source %}
+                                        <div class="text-muted small">From {{ b.source }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>{{ b.travel_date | date_format }}</div>
+                                    {% if b.booking_status != 'Cancelled' %}
+                                        <span class="badge-custom {{ b.countdown_badge }} mt-1">
+                                            {{ b.countdown_label }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ b.formatted_total }}</div>
+                                    <div class="text-muted small">Paid: {{ b.formatted_paid }}</div>
+                                </td>
+                                <td>
+                                    {% if b.payment_status == 'Paid' %}
+                                        <span class="badge-custom badge-pay-paid">
+                                            <i class="bi bi-check2 me-1"></i>Paid
+                                        </span>
+                                    {% elif b.payment_status == 'Partially Paid' %}
+                                        <span class="badge-custom badge-pay-partial">
+                                            <i class="bi bi-clock me-1"></i>Partial
+                                        </span>
+                                        <div class="small text-danger">Due: {{ b.formatted_balance }}</div>
+                                    {% else %}
+                                        <span class="badge-custom badge-pay-unpaid">
+                                            <i class="bi bi-x-circle me-1"></i>Unpaid
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge-custom badge-status-{{ b.booking_status | lower }}">
+                                        {{ b.booking_status }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-slate p-1 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('booking_details', booking_id=b.booking_id) }}">
+                                                    <i class="bi bi-eye text-primary me-2"></i>View Details
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('print_booking', booking_id=b.booking_id) }}" target="_blank">
+                                                    <i class="bi bi-printer text-secondary me-2"></i>Print Voucher
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('edit_booking', booking_id=b.booking_id) }}">
+                                                    <i class="bi bi-pencil text-warning me-2"></i>Edit Booking
+                                                </a>
+                                            </li>
+                                            {% if current_user.is_admin %}
+                                                <li><hr class="dropdown-divider"></li>
+                                                {% if b.booking_status != 'Cancelled' %}
+                                                    <li>
+                                                        <form action="{{ url_for('cancel_booking_action', booking_id=b.booking_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel booking {{ b.booking_id }}?');">
+                                                            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                                            <button type="submit" class="dropdown-item text-warning">
+                                                                <i class="bi bi-x-octagon me-2"></i>Cancel Booking
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                {% endif %}
+                                                <li>
+                                                    <form action="{{ url_for('delete_booking_action', booking_id=b.booking_id) }}" method="POST" onsubmit="return confirm('Permanently delete booking {{ b.booking_id }}? This cannot be undone.');">
+                                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="bi bi-trash3 me-2"></i>Delete Permanently
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            {% if pagination.total_pages > 1 %}
+                <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                    <span class="text-muted small">
+                        Page {{ pagination.page }} of {{ pagination.total_pages }} ({{ pagination.total_items }} total)
+                    </span>
+                    <nav aria-label="Bookings Pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('bookings', page=pagination.prev_page, **query_params) }}">Previous</a>
+                            </li>
+                            {% for p in range(1, pagination.total_pages + 1) %}
+                                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('bookings', page=p, **query_params) }}">{{ p }}</a>
+                                </li>
+                            {% endfor %}
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('bookings', page=pagination.next_page, **query_params) }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h5 class="empty-state-title">No matching bookings found</h5>
+                <p class="empty-state-text">No records matched your search or filter criteria. Try resetting filters or creating a new booking.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('bookings') }}" class="btn btn-outline-slate btn-sm">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
+                    </a>
+                    <a href="{{ url_for('add_booking') }}" class="btn btn-primary-teal btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i>New Booking
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/bookings.js') }}"></script>
+{% endblock %}

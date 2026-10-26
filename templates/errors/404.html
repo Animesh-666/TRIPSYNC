@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}404 Not Found — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="empty-state my-5">
+    <div class="empty-state-icon text-warning" style="background: rgba(217, 119, 6, 0.12);">
+        <i class="bi bi-question-circle"></i>
+    </div>
+    <h3 class="empty-state-title">404 — Record or Page Not Found</h3>
+    <p class="empty-state-text">
+        {{ error_message or "The requested booking ID or page URL could not be located in the database." }}
+    </p>
+    <div class="d-flex justify-content-center gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary-teal btn-sm">
+            <i class="bi bi-house-door me-1"></i>Return to Dashboard
+        </a>
+        <a href="{{ url_for('bookings') }}" class="btn btn-outline-slate btn-sm">
+            <i class="bi bi-search me-1"></i>View All Bookings
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Upcoming Trips — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h1 class="page-title">Upcoming Trips & Countdown</h1>
+        <p class="page-subtitle">Monitoring scheduled departures and hotel check-ins for the next 7 days in Asia/Kolkata timezone.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('add_booking') }}" class="btn btn-primary-teal d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Booking</span>
+        </a>
+    </div>
+</div>
+
+{% if trips %}
+    <!-- Countdown Cards Grid -->
+    <div class="row g-4 mb-4">
+        {% for trip in trips %}
+            <div class="col-12 col-md-6 col-xl-4">
+                <div class="card-custom h-100 tilt-card">
+                    <div class="card-header-clean d-flex justify-content-between align-items-center">
+                        <span class="booking-code">{{ trip.booking_id }}</span>
+                        <span class="badge-custom {{ trip.countdown_badge }}">
+                            <i class="bi bi-clock-history me-1"></i>{{ trip.countdown_label }}
+                        </span>
+                    </div>
+                    <div class="card-body-clean">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge-custom badge-{{ trip.travel_type }}">
+                                <i class="bi {{ category_icons.get(trip.travel_type, 'bi-tag') }}"></i>
+                                {{ trip.travel_type | capitalize }}
+                            </span>
+                            <span class="badge-custom badge-status-{{ trip.booking_status | lower }}">
+                                {{ trip.booking_status }}
+                            </span>
+                        </div>
+
+                        <h5 class="fw-bold text-navy mb-1">{{ trip.customer_name }}</h5>
+                        <div class="text-muted small mb-3">
+                            <i class="bi bi-telephone me-1"></i>{{ trip.contact }}
+                        </div>
+
+                        <div class="p-3 bg-light rounded mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-muted small">Destination:</span>
+                                <span class="fw-bold text-navy">{{ trip.destination }}</span>
+                            </div>
+                            {% if trip.travel_type == 'hotel' and trip.hotel_name %}
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-muted small">Hotel:</span>
+                                    <span class="fw-semibold text-truncate" style="max-width: 160px;">{{ trip.hotel_name }}</span>
+                                </div>
+                            {% elif trip.source %}
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-muted small">Departure From:</span>
+                                    <span class="fw-semibold">{{ trip.source }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">Scheduled Date:</span>
+                                <span class="fw-bold text-primary-teal">{{ trip.travel_date | date_format }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <div>
+                                <div class="text-muted small">Total Fare:</div>
+                                <div class="fw-bold text-navy">{{ trip.formatted_total }}</div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('print_booking', booking_id=trip.booking_id) }}" target="_blank" class="btn btn-sm btn-outline-slate" title="Print Voucher">
+                                    <i class="bi bi-printer"></i>
+                                </a>
+                                <a href="{{ url_for('booking_details', booking_id=trip.booking_id) }}" class="btn btn-sm btn-primary-teal">
+                                    <span>Details</span>
+                                    <i class="bi bi-chevron-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="bi bi-calendar-check"></i>
+        </div>
+        <h5 class="empty-state-title">No upcoming journeys in the next 7 days</h5>
+        <p class="empty-state-text">All currently scheduled bookings are either in the past, cancelled, or scheduled more than 7 days ahead.</p>
+        <a href="{{ url_for('bookings') }}" class="btn btn-outline-slate btn-sm">Browse All Bookings</a>
+    </div>
+{% endif %}
+{% endblock %}

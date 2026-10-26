@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: travel-booking-organizer
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    plan: free
+    autoDeployTrigger: commit
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/serviceAccountKey.json
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_API_KEY
+        sync: false
+      - key: FIREBASE_AUTH_DOMAIN
+        sync: false
+      - key: FIREBASE_STORAGE_BUCKET
+        sync: false
+      - key: FIREBASE_MESSAGING_SENDER_ID
+        sync: false
+      - key: FIREBASE_APP_ID
+        sync: false
+    # Add a private Secret File called serviceAccountKey.json in the Render
+    # service dashboard (Environment > Secret Files); do not commit it.

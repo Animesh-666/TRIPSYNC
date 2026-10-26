@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ booking.booking_id }} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('bookings') }}">Bookings</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('booking_details', booking_id=booking.booking_id) }}">{{ booking.booking_id }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+    <div class="d-flex align-items-center gap-3">
+        <h1 class="page-title">Edit Booking Record</h1>
+        <span class="booking-code fs-6">{{ booking.booking_id }}</span>
+    </div>
+    <p class="page-subtitle">Modifying existing reservation details. Original ID and audit history are strictly preserved.</p>
+</div>
+
+{% set action_url = url_for('update_booking_action', booking_id=booking.booking_id) %}
+{% set cancel_url = url_for('booking_details', booking_id=booking.booking_id) %}
+{% include '_booking_form.html' %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+{% endblock %}

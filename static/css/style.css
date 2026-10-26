@@ -1,0 +1,152 @@
+/* ==========================================================================
+   TripSync — Travel Booking Data Organizer
+   Design System & Global Styles
+   ========================================================================== */
+
+:root {
+    /* Brand Palette */
+    --primary-navy: #0F172A;
+    --navy-surface: #1E293B;
+    --navy-light: #334155;
+    --primary-teal: #0D9488;
+    --teal-hover: #0F766E;
+    --teal-subtle: rgba(13, 148, 136, 0.12);
+    --bright-cyan: #06B6D4;
+    --cyan-subtle: rgba(6, 182, 212, 0.12);
+    
+    /* Backgrounds & Surfaces */
+    --bg-main: #F8FAFC;
+    --surface-card: #FFFFFF;
+    --surface-glass: rgba(255, 255, 255, 0.85);
+    --border-color: #E2E8F0;
+    --border-subtle: #F1F5F9;
+
+    /* Typography Colors */
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-light: #94A3B8;
+
+    /* Semantic Feedback */
+    --color-success: #16A34A;
+    --color-success-bg: rgba(22, 163, 74, 0.12);
+    --color-warning: #D97706;
+    --color-warning-bg: rgba(217, 119, 6, 0.12);
+    --color-danger: #DC2626;
+    --color-danger-bg: rgba(220, 38, 38, 0.12);
+    --color-info: #0284C7;
+    --color-info-bg: rgba(2, 132, 199, 0.12);
+
+    /* Shadows & 3D Layering */
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+    --shadow-3d: 0 20px 25px -5px rgba(15, 23, 42, 0.10), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+    --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.25);
+
+    /* Dimensions */
+    --sidebar-width: 260px;
+    --navbar-height: 70px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-full: 9999px;
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Document */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+a {
+    color: var(--primary-teal);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--teal-hover);
+}
+
+/* Master Layout Grid */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--bg-main);
+}
+
+.page-container {
+    padding: 1.75rem 2rem;
+    flex: 1;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem 1rem;
+    }
+}
+
+/* Typography Helpers */
+.page-title {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--primary-navy);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Footer */
+.app-footer {
+    padding: 1rem 2rem;
+    background: #FFFFFF;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}

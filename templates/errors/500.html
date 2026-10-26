@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_code or 500 }} Error — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="empty-state my-5">
+    <div class="empty-state-icon text-danger" style="background: rgba(220, 38, 38, 0.12);">
+        <i class="bi bi-exclamation-octagon"></i>
+    </div>
+    <h3 class="empty-state-title">{{ error_code or 500 }} — Unexpected Request State</h3>
+    <p class="empty-state-text">
+        {{ error_message or "An internal error occurred while processing your request. Please check server logs or refresh the page." }}
+    </p>
+    <div class="d-flex justify-content-center gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary-teal btn-sm">
+            <i class="bi bi-house-door me-1"></i>Return to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

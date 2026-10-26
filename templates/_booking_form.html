@@ -1,0 +1,248 @@
+<form id="booking-form" method="POST" action="{{ action_url }}" data-protect-submit novalidate>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+    {% if errors.general %}
+        <div class="alert alert-danger py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errors.general }}
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Left Column: Form Fields -->
+        <div class="col-12 col-lg-8">
+            <!-- 1. Customer Information Section -->
+            <div class="card-custom mb-4">
+                <div class="card-header-clean">
+                    <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                        <i class="bi bi-person-badge text-primary-teal"></i>
+                        <span>1. Customer Details</span>
+                    </span>
+                </div>
+                <div class="card-body-clean">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="customer_name" class="form-label-custom">Customer Full Name <span class="req">*</span></label>
+                            <input type="text" class="form-control form-control-custom {% if errors.customer_name %}is-invalid{% endif %}" id="customer_name" name="customer_name" value="{{ form_data.customer_name or '' }}" placeholder="e.g. Priya Sharma" required>
+                            {% if errors.customer_name %}
+                                <div class="invalid-feedback">{{ errors.customer_name }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="contact" class="form-label-custom">Contact Mobile Number <span class="req">*</span></label>
+                            <input type="tel" class="form-control form-control-custom {% if errors.contact %}is-invalid{% endif %}" id="contact" name="contact" value="{{ form_data.contact or '' }}" placeholder="10-digit number (e.g. 9876543210)" pattern="^[6-9]\d{9}$" required>
+                            <div class="form-text small text-muted">10-digit Indian mobile number format.</div>
+                            {% if errors.contact %}
+                                <div class="invalid-feedback">{{ errors.contact }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Travel & Reservation Details -->
+            <div class="card-custom mb-4">
+                <div class="card-header-clean">
+                    <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                        <i class="bi bi-compass text-primary-teal"></i>
+                        <span>2. Travel Category & Itinerary</span>
+                    </span>
+                </div>
+                <div class="card-body-clean">
+                    <!-- Category Selector -->
+                    <div class="mb-4">
+                        <label for="travel_type" class="form-label-custom">Travel Category <span class="req">*</span></label>
+                        <select class="form-select form-select-custom {% if errors.travel_type %}is-invalid{% endif %}" id="travel_type" name="travel_type" required>
+                            {% for cat in categories %}
+                                <option value="{{ cat }}" {% if form_data.travel_type == cat %}selected{% endif %}>
+                                    {{ category_labels[cat] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.travel_type %}
+                            <div class="invalid-feedback">{{ errors.travel_type }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Transport Fields (Flight, Train, Bus) -->
+                    <div id="transport-fields">
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label for="source" class="form-label-custom">Departure Location (Source) <span class="req">*</span></label>
+                                <input type="text" class="form-control form-control-custom {% if errors.source %}is-invalid{% endif %}" id="source" name="source" list="destinations-list" value="{{ form_data.source or '' }}" placeholder="City / Station">
+                                {% if errors.source %}
+                                    <div class="invalid-feedback">{{ errors.source }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="passengers" class="form-label-custom">Number of Passengers <span class="req">*</span></label>
+                                <input type="number" class="form-control form-control-custom {% if errors.passengers %}is-invalid{% endif %}" id="passengers" name="passengers" value="{{ form_data.passengers or 1 }}" min="1" max="50">
+                                {% if errors.passengers %}
+                                    <div class="invalid-feedback">{{ errors.passengers }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hotel Fields -->
+                    <div id="hotel-fields" class="d-none">
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label for="hotel_name" class="form-label-custom">Hotel / Resort Name <span class="req">*</span></label>
+                                <input type="text" class="form-control form-control-custom {% if errors.hotel_name %}is-invalid{% endif %}" id="hotel_name" name="hotel_name" value="{{ form_data.hotel_name or '' }}" placeholder="e.g. Grand Heritage Palace">
+                                {% if errors.hotel_name %}
+                                    <div class="invalid-feedback">{{ errors.hotel_name }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <label for="rooms" class="form-label-custom">Rooms <span class="req">*</span></label>
+                                <input type="number" class="form-control form-control-custom {% if errors.rooms %}is-invalid{% endif %}" id="rooms" name="rooms" value="{{ form_data.rooms or 1 }}" min="1" max="20">
+                                {% if errors.rooms %}
+                                    <div class="invalid-feedback">{{ errors.rooms }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <label for="guests" class="form-label-custom">Guests</label>
+                                <input type="number" class="form-control form-control-custom {% if errors.guests %}is-invalid{% endif %}" id="guests" name="guests" value="{{ form_data.guests or 1 }}" min="1" max="50">
+                                {% if errors.guests %}
+                                    <div class="invalid-feedback">{{ errors.guests }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shared Location & Dates -->
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="destination" id="destination-label" class="form-label-custom">Destination <span class="req">*</span></label>
+                            <input type="text" class="form-control form-control-custom {% if errors.destination %}is-invalid{% endif %}" id="destination" name="destination" list="destinations-list" value="{{ form_data.destination or '' }}" placeholder="City name" required>
+                            {% if errors.destination %}
+                                <div class="invalid-feedback">{{ errors.destination }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="travel_date" id="travel-date-label" class="form-label-custom">Travel Date <span class="req">*</span></label>
+                            <input type="date" class="form-control form-control-custom {% if errors.travel_date %}is-invalid{% endif %}" id="travel_date" name="travel_date" value="{{ form_data.travel_date or today }}" required>
+                            {% if errors.travel_date %}
+                                <div class="invalid-feedback">{{ errors.travel_date }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Check-out Date for Hotel -->
+                        <div class="col-12 col-md-6" id="checkout-container">
+                            <div id="checkout-field-wrapper" class="d-none">
+                                <label for="check_out_date" class="form-label-custom">Check-out Date <span class="req">*</span></label>
+                                <input type="date" class="form-control form-control-custom {% if errors.check_out_date %}is-invalid{% endif %}" id="check_out_date" name="check_out_date" value="{{ form_data.check_out_date or '' }}">
+                                {% if errors.check_out_date %}
+                                    <div class="invalid-feedback">{{ errors.check_out_date }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datalist of Standard Indian Destinations -->
+                    <datalist id="destinations-list">
+                        {% for city in standard_destinations %}
+                            <option value="{{ city }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+            </div>
+
+            <!-- 3. Fare and Payment Tracking -->
+            <div class="card-custom mb-4">
+                <div class="card-header-clean">
+                    <span class="fw-bold text-navy d-flex align-items-center gap-2">
+                        <i class="bi bi-cash-coin text-primary-teal"></i>
+                        <span>3. Fare & Recorded Payments</span>
+                    </span>
+                </div>
+                <div class="card-body-clean">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="unit_fare" id="unit-fare-label" class="form-label-custom">Fare per Passenger (₹) <span class="req">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">₹</span>
+                                <input type="number" step="0.01" min="0" class="form-control form-control-custom {% if errors.unit_fare %}is-invalid{% endif %}" id="unit_fare" name="unit_fare" value="{{ form_data.unit_fare or 0 }}" required>
+                            </div>
+                            {% if errors.unit_fare %}
+                                <div class="text-danger small mt-1">{{ errors.unit_fare }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="amount_paid" class="form-label-custom">Amount Received (₹) <span class="req">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">₹</span>
+                                <input type="number" step="0.01" min="0" class="form-control form-control-custom {% if errors.amount_paid %}is-invalid{% endif %}" id="amount_paid" name="amount_paid" value="{{ form_data.amount_paid or 0 }}" required>
+                            </div>
+                            <div id="payment-warning" class="text-danger small mt-1 d-none"></div>
+                            {% if errors.amount_paid %}
+                                <div class="text-danger small mt-1">{{ errors.amount_paid }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="booking_status" class="form-label-custom">Booking Status <span class="req">*</span></label>
+                            <select class="form-select form-select-custom" id="booking_status" name="booking_status">
+                                {% for stat in booking_statuses if stat != 'Cancelled' %}
+                                    <option value="{{ stat }}" {% if form_data.booking_status == stat %}selected{% endif %}>
+                                        {{ stat }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if errors.booking_status %}<div class="text-danger small mt-1">{{ errors.booking_status }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex align-items-center gap-3">
+                <button type="submit" class="btn btn-primary-teal px-4 py-2">
+                    <i class="bi bi-check-lg me-1"></i>Save Booking Record
+                </button>
+                <a href="{{ cancel_url }}" class="btn btn-outline-slate px-3 py-2">Cancel</a>
+            </div>
+        </div>
+
+        <!-- Right Column: Live Amount Breakdown Card -->
+        <div class="col-12 col-lg-4">
+            <div class="amount-preview-card sticky-top" style="top: 90px;">
+                <div class="amount-preview-title d-flex justify-content-between align-items-center">
+                    <span>Live Amount Breakdown</span>
+                    <span id="preview-status-badge" class="badge-custom badge-pay-unpaid">Unpaid</span>
+                </div>
+
+                <div class="amount-preview-row">
+                    <span>Rate / Unit Fare:</span>
+                    <span id="preview-formula" class="font-monospace small">1 Pax × ₹0.00</span>
+                </div>
+
+                <div class="amount-preview-row total-row">
+                    <span>Total Amount:</span>
+                    <span id="preview-total" class="val">₹0.00</span>
+                </div>
+
+                <div class="amount-preview-row mt-2">
+                    <span>Amount Received:</span>
+                    <span id="preview-paid" class="text-success fw-bold">₹0.00</span>
+                </div>
+
+                <div class="amount-preview-row">
+                    <span>Outstanding Balance:</span>
+                    <span id="preview-balance" class="text-warning fw-bold">₹0.00</span>
+                </div>
+
+                <div class="mt-3 pt-3 border-top border-secondary small text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Money is securely validated in integer paise on the server to prevent floating-point calculation errors.
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

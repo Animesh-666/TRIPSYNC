@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h1 class="page-title">Operations Command Center</h1>
+        <p class="page-subtitle">Welcome back, <strong>{{ current_user.name }}</strong> ({{ current_user.role | upper }}). Current booking records and payment statistics.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('add_booking') }}" class="btn btn-primary-teal d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Booking</span>
+        </a>
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('reports') }}" class="btn btn-outline-slate d-inline-flex align-items-center gap-2">
+                <i class="bi bi-bar-chart-line"></i>
+                <span>Reports</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- KPI Summary Cards Grid (with 3D Tilt interaction) -->
+<div class="row g-3 mb-4">
+    <!-- 1. Total Active Bookings -->
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+        <div class="kpi-card tilt-card h-100">
+            <div class="kpi-header">
+                <span class="kpi-title">Active Trips</span>
+                <div class="kpi-icon-box kpi-icon-teal">
+                    <i class="bi bi-calendar2-check"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ metrics.total_active_bookings }}</div>
+            <div class="kpi-subtitle text-muted">Excludes cancelled</div>
+        </div>
+    </div>
+
+    <!-- 2. Confirmed Bookings -->
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+        <div class="kpi-card tilt-card h-100">
+            <div class="kpi-header">
+                <span class="kpi-title">Confirmed</span>
+                <div class="kpi-icon-box kpi-icon-green">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ metrics.confirmed_bookings }}</div>
+            <div class="kpi-subtitle text-success">Ready for departure</div>
+        </div>
+    </div>
+
+    <!-- 3. Upcoming Trips (7 Days) -->
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+        <div class="kpi-card tilt-card h-100">
+            <div class="kpi-header">
+                <span class="kpi-title">Next 7 Days</span>
+                <div class="kpi-icon-box kpi-icon-blue">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ metrics.upcoming_trips_count }}</div>
+            <div class="kpi-subtitle text-info">Imminent departures</div>
+        </div>
+    </div>
+
+    <!-- 4. Active Booking Value -->
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+        <div class="kpi-card tilt-card h-100">
+            <div class="kpi-header">
+                <span class="kpi-title">Total Value</span>
+                <div class="kpi-icon-box kpi-icon-teal">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+            <div class="kpi-value fs-4">{{ metrics.formatted_active_value }}</div>
+            <div class="kpi-subtitle text-muted">Active bookings</div>
+        </div>
+    </div>
+
+    <!-- 5. Recorded Collections -->
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+        <div class="kpi-card tilt-card h-100">
+            <div class="kpi-header">
+                <span class="kpi-title">Collected</span>
+                <div class="kpi-icon-box kpi-icon-green">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+            <div class="kpi-value fs-4 text-success">{{ metrics.formatted_recorded_payments }}</div>
+            <div class="kpi-subtitle text-muted">Total payments received</div>
+        </div>
+    </div>
+
+    <!-- 6. Outstanding Balance -->
+    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+        <div class="kpi-card tilt-card h-100">
+            <div class="kpi-header">
+                <span class="kpi-title">Pending</span>
+                <div class="kpi-icon-box kpi-icon-warning">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+            <div class="kpi-value fs-4 text-warning">{{ metrics.formatted_outstanding_balance }}</div>
+            <div class="kpi-subtitle text-muted">Uncollected dues</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="row g-4 mb-4">
+    <!-- Left Column: Upcoming Trips & Category Distribution -->
+    <div class="col-12 col-lg-7">
+        <!-- Upcoming Journeys Card -->
+        <div class="card-custom mb-4">
+            <div class="card-header-clean">
+                <div class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-range text-primary-teal"></i>
+                    <span>Upcoming Journeys (Next 7 Days)</span>
+                </div>
+                <a href="{{ url_for('upcoming') }}" class="btn btn-outline-slate btn-sm">View All ({{ metrics.upcoming_trips_count }})</a>
+            </div>
+            <div class="card-body-clean p-0">
+                {% if upcoming_trips %}
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Category</th>
+                                    <th>Destination</th>
+                                    <th>Departure</th>
+                                    <th>Countdown</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trip in upcoming_trips %}
+                                    <tr>
+                                        <td>
+                                            <span class="booking-code">{{ trip.booking_id }}</span>
+                                        </td>
+                                        <td class="fw-semibold">{{ trip.customer_name }}</td>
+                                        <td>
+                                            <span class="badge-custom badge-{{ trip.travel_type }}">
+                                                <i class="bi {{ category_icons.get(trip.travel_type, 'bi-tag') }}"></i>
+                                                {{ trip.travel_type | capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>{{ trip.destination }}</td>
+                                        <td>{{ trip.travel_date | date_format }}</td>
+                                        <td>
+                                            <span class="badge-custom {{ trip.countdown_badge }}">
+                                                {{ trip.countdown_label }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('booking_details', booking_id=trip.booking_id) }}" class="btn btn-sm btn-outline-slate p-1 px-2" title="View Booking">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state p-4">
+                        <div class="empty-state-icon" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h6 class="empty-state-title">No Trips in the Next 7 Days</h6>
+                        <p class="empty-state-text small mb-0">There are no upcoming travel bookings scheduled within the next week.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Bookings Card -->
+        <div class="card-custom">
+            <div class="card-header-clean">
+                <div class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-primary-teal"></i>
+                    <span>Recently Created Bookings</span>
+                </div>
+                <a href="{{ url_for('bookings') }}" class="btn btn-outline-slate btn-sm">All Bookings</a>
+            </div>
+            <div class="card-body-clean p-0">
+                {% if recent_bookings %}
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Destination</th>
+                                    <th>Total</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in recent_bookings %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('booking_details', booking_id=b.booking_id) }}" class="booking-code text-decoration-none">
+                                                {{ b.booking_id }}
+                                            </a>
+                                        </td>
+                                        <td class="fw-semibold">{{ b.customer_name }}</td>
+                                        <td>{{ b.destination }}</td>
+                                        <td class="fw-bold">{{ b.formatted_total }}</td>
+                                        <td>
+                                            {% if b.payment_status == 'Paid' %}
+                                                <span class="badge-custom badge-pay-paid">Paid</span>
+                                            {% elif b.payment_status == 'Partially Paid' %}
+                                                <span class="badge-custom badge-pay-partial">Partial</span>
+                                            {% else %}
+                                                <span class="badge-custom badge-pay-unpaid">Unpaid</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge-custom badge-status-{{ b.booking_status | lower }}">
+                                                {{ b.booking_status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state p-4">
+                        <p class="empty-state-text small mb-0">No booking records found. Start by creating a new booking.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Analytics & Distributions -->
+    <div class="col-12 col-lg-5">
+        <!-- Category Distribution Chart -->
+        <div class="card-custom mb-4">
+            <div class="card-header-clean">
+                <div class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-pie-chart text-primary-teal"></i>
+                    <span>Category Breakdown</span>
+                </div>
+                <span class="badge bg-light text-muted border">Active</span>
+            </div>
+            <div class="card-body-clean">
+                <div style="height: 240px; position: relative;">
+                    <canvas id="categoryDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Destinations Card -->
+        <div class="card-custom">
+            <div class="card-header-clean">
+                <div class="fw-bold text-navy d-flex align-items-center gap-2">
+                    <i class="bi bi-geo-alt text-primary-teal"></i>
+                    <span>Popular Destinations</span>
+                </div>
+            </div>
+            <div class="card-body-clean">
+                {% if metrics.top_destinations %}
+                    <ul class="list-group list-group-flush">
+                        {% for city, count in metrics.top_destinations %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-primary-teal"><i class="bi bi-pin-map-fill"></i></span>
+                                    <span class="fw-semibold text-navy">{{ city }}</span>
+                                </div>
+                                <span class="badge bg-light text-dark border rounded-pill">{{ count }} booking{{ 's' if count > 1 else '' }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-muted small text-center py-3">No destination records available.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+    window.CHART_CATEGORY_DATA = {{ metrics.category_counts | tojson | safe }};
+    window.CHART_PAYMENT_DATA = {{ metrics.payment_status_counts | tojson | safe }};
+</script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

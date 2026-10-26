@@ -1,0 +1,79 @@
+<aside class="sidebar no-print">
+    <div class="sidebar-header">
+        <div class="brand-icon-box">
+            <i class="bi bi-compass"></i>
+        </div>
+        <div>
+            <div class="brand-text">{{ app_name }}</div>
+            <div class="brand-tag">v{{ app_version }}</div>
+        </div>
+    </div>
+
+    <ul class="sidebar-menu">
+        <li class="sidebar-section-label">Main Menu</li>
+        
+        <li class="sidebar-item">
+            <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="sidebar-item">
+            <a href="{{ url_for('bookings') }}" class="sidebar-link {% if request.endpoint in ('bookings', 'booking_details', 'edit_booking') %}active{% endif %}">
+                <i class="bi bi-journal-text"></i>
+                <span>All Bookings</span>
+            </a>
+        </li>
+
+        <li class="sidebar-item">
+            <a href="{{ url_for('add_booking') }}" class="sidebar-link {% if request.endpoint == 'add_booking' %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i>
+                <span>Add Booking</span>
+            </a>
+        </li>
+
+        <li class="sidebar-item">
+            <a href="{{ url_for('upcoming') }}" class="sidebar-link {% if request.endpoint == 'upcoming' %}active{% endif %}">
+                <i class="bi bi-calendar-event"></i>
+                <span>Upcoming Trips</span>
+            </a>
+        </li>
+
+        {% if current_user and current_user.is_admin %}
+            <li class="sidebar-section-label">Administration</li>
+
+            <li class="sidebar-item">
+                <a href="{{ url_for('reports') }}" class="sidebar-link {% if request.endpoint == 'reports' %}active{% endif %}">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span>Analytics & Reports</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a href="{{ url_for('export_csv') }}" class="sidebar-link">
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+                    <span>Export CSV</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+
+    {% if current_user %}
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar">
+                {{ current_user.name[:1] | upper }}
+            </div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ current_user.name }}</div>
+                <div class="sidebar-user-role">
+                    {% if current_user.is_admin %}
+                        <span class="text-info font-weight-bold"><i class="bi bi-shield-check me-1"></i>ADMIN</span>
+                    {% else %}
+                        <span class="text-muted"><i class="bi bi-person me-1"></i>STAFF</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</aside>

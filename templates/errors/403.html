@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}403 Forbidden — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="empty-state my-5">
+    <div class="empty-state-icon text-danger" style="background: rgba(220, 38, 38, 0.12);">
+        <i class="bi bi-shield-x"></i>
+    </div>
+    <h3 class="empty-state-title">403 — Access Denied</h3>
+    <p class="empty-state-text">
+        You do not have the required role permissions to access this administrative feature.
+        Staff members cannot access reports, export full datasets, or cancel/delete bookings.
+    </p>
+    <div class="d-flex justify-content-center gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary-teal btn-sm">
+            <i class="bi bi-house-door me-1"></i>Return to Dashboard
+        </a>
+        <a href="{{ url_for('bookings') }}" class="btn btn-outline-slate btn-sm">
+            <i class="bi bi-journal-text me-1"></i>Browse Bookings
+        </a>
+    </div>
+</div>
+{% endblock %}

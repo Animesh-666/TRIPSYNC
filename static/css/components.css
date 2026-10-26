@@ -1,0 +1,629 @@
+/* ==========================================================================
+   TripSync — Reusable UI Components
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Sidebar Navigation
+   -------------------------------------------------------------------------- */
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--primary-navy) 0%, #0B1120 100%);
+    color: #F8FAFC;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all var(--transition-smooth);
+    z-index: 1000;
+}
+
+.sidebar-header {
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-icon-box {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--primary-teal), var(--bright-cyan));
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+}
+
+.brand-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+}
+
+.brand-tag {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    background: rgba(34, 211, 238, 0.2);
+    color: var(--bright-cyan);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 1.25rem 0.75rem;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748B;
+    padding: 0.75rem 0.75rem 0.25rem;
+    font-weight: 700;
+}
+
+.sidebar-item {
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 0.85rem;
+    color: #94A3B8;
+    border-radius: var(--radius-sm);
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-link i {
+    font-size: 1.15rem;
+    width: 24px;
+    text-align: center;
+    transition: transform var(--transition-fast);
+}
+
+.sidebar-link:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-link:hover i {
+    transform: scale(1.15);
+    color: var(--bright-cyan);
+}
+
+.sidebar-link.active {
+    color: #FFFFFF;
+    background: linear-gradient(90deg, rgba(13, 148, 136, 0.3) 0%, rgba(13, 148, 136, 0.08) 100%);
+    border-left: 3px solid var(--bright-cyan);
+    font-weight: 600;
+}
+
+.sidebar-link.active i {
+    color: var(--bright-cyan);
+}
+
+/* User profile snippet at bottom of sidebar */
+.sidebar-user {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sidebar-user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #FFFFFF;
+    font-size: 0.9rem;
+}
+
+.sidebar-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-user-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #F8FAFC;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+    font-size: 0.72rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   2. Navbar Header
+   -------------------------------------------------------------------------- */
+.top-navbar {
+    height: var(--navbar-height);
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.navbar-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 1.35rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: none;
+    padding: 0.25rem;
+}
+
+@media (max-width: 992px) {
+    .navbar-toggle-btn {
+        display: block;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -260px;
+        transition: transform var(--transition-smooth);
+    }
+    .sidebar.show {
+        transform: translateX(260px);
+    }
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        z-index: 995;
+    }
+    .sidebar-overlay.show {
+        display: block;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. Cards & 3D Tilt Elements
+   -------------------------------------------------------------------------- */
+.card-custom {
+    background: var(--surface-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    overflow: hidden;
+}
+
+.card-custom:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card-header-clean {
+    padding: 1.25rem 1.5rem;
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-body-clean {
+    padding: 1.5rem;
+}
+
+/* KPI Summary Cards */
+.kpi-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.4rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    perspective: 1000px;
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-teal), var(--bright-cyan));
+    opacity: 0.85;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.kpi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.kpi-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.kpi-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.kpi-icon-teal {
+    background: var(--teal-subtle);
+    color: var(--primary-teal);
+}
+
+.kpi-icon-blue {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+}
+
+.kpi-icon-green {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.kpi-icon-warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.kpi-icon-red {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.kpi-value {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--primary-navy);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.kpi-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. Badges (Category, Booking, Payment, Countdown)
+   -------------------------------------------------------------------------- */
+.badge-custom {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.02em;
+}
+
+/* Categories */
+.badge-flight {
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284C7;
+    border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.badge-train {
+    background: rgba(168, 85, 247, 0.12);
+    color: #9333EA;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.badge-bus {
+    background: rgba(234, 88, 12, 0.12);
+    color: #C2410C;
+    border: 1px solid rgba(234, 88, 12, 0.25);
+}
+
+.badge-hotel {
+    background: rgba(13, 148, 136, 0.12);
+    color: #0D9488;
+    border: 1px solid rgba(13, 148, 136, 0.25);
+}
+
+/* Booking Status */
+.badge-status-confirmed {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+.badge-status-pending {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+.badge-status-cancelled {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+/* Payment Status */
+.badge-pay-paid {
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803D;
+    font-weight: 700;
+}
+
+.badge-pay-partial {
+    background: rgba(234, 179, 8, 0.15);
+    color: #A16207;
+    font-weight: 700;
+}
+
+.badge-pay-unpaid {
+    background: rgba(239, 68, 68, 0.12);
+    color: #B91C1C;
+    font-weight: 700;
+}
+
+/* Countdowns */
+.badge-today {
+    background: linear-gradient(135deg, #DC2626, #EA580C);
+    color: #FFFFFF;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+}
+
+.badge-tomorrow {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.badge-upcoming {
+    background: rgba(13, 148, 136, 0.15);
+    color: #0D9488;
+    font-weight: 600;
+}
+
+.badge-past {
+    background: #E2E8F0;
+    color: #64748B;
+}
+
+/* --------------------------------------------------------------------------
+   5. Tables
+   -------------------------------------------------------------------------- */
+.table-custom {
+    width: 100%;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.table-custom th {
+    background: #F8FAFC;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.table-custom td {
+    padding: 0.9rem 1rem;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-subtle);
+    background: #FFFFFF;
+    transition: background var(--transition-fast);
+}
+
+.table-custom tr:hover td {
+    background: #F1F5F9;
+}
+
+.booking-code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-weight: 700;
+    color: var(--primary-teal);
+    background: var(--teal-subtle);
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. Buttons & Interactive Controls
+   -------------------------------------------------------------------------- */
+.btn-primary-teal {
+    background: linear-gradient(135deg, var(--primary-teal), #0F766E);
+    border: 1px solid var(--primary-teal);
+    color: #FFFFFF;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 1.15rem;
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+}
+
+.btn-primary-teal:hover {
+    background: linear-gradient(135deg, #0F766E, #115E59);
+    color: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-outline-slate {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 1rem;
+    transition: all var(--transition-fast);
+}
+
+.btn-outline-slate:hover {
+    background: #F8FAFC;
+    color: var(--text-primary);
+    border-color: #CBD5E1;
+}
+
+/* --------------------------------------------------------------------------
+   7. Form Controls & Amount Summary Widget
+   -------------------------------------------------------------------------- */
+.form-label-custom {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+}
+
+.form-label-custom .req {
+    color: var(--color-danger);
+}
+
+.form-control-custom, .form-select-custom {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background-color: #FFFFFF;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control-custom:focus, .form-select-custom:focus {
+    border-color: var(--primary-teal);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+.amount-preview-card {
+    background: linear-gradient(135deg, var(--navy-surface) 0%, var(--primary-navy) 100%);
+    color: #FFFFFF;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.amount-preview-title {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94A3B8;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+
+.amount-preview-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+    color: #CBD5E1;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.amount-preview-row.total-row {
+    border-bottom: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.amount-preview-row.total-row .val {
+    color: var(--bright-cyan);
+    font-size: 1.35rem;
+}
+
+/* --------------------------------------------------------------------------
+   8. Empty States
+   -------------------------------------------------------------------------- */
+.empty-state {
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    background: #FFFFFF;
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-color);
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.25rem;
+    background: var(--teal-subtle);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--primary-teal);
+}
+
+.empty-state-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--primary-navy);
+    margin-bottom: 0.35rem;
+}
+
+.empty-state-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 400px;
+    margin: 0 auto 1.25rem;
+}

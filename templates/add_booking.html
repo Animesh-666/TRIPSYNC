@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}New Booking — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('bookings') }}">Bookings</a></li>
+            <li class="breadcrumb-item active" aria-current="page">New Booking</li>
+        </ol>
+    </nav>
+    <h1 class="page-title">Add Travel Booking Record</h1>
+    <p class="page-subtitle">Enter customer reservation details. Sequential ID will be assigned automatically upon saving.</p>
+</div>
+
+{% set action_url = url_for('create_booking_action') %}
+{% set cancel_url = url_for('bookings') %}
+{% include '_booking_form.html' %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+{% endblock %}
