@@ -25,6 +25,12 @@
 
 ---
 
+[![TRIPSYNC Tests](https://github.com/Animesh-666/TRIPSYNC/actions/workflows/tests.yml/badge.svg)](https://github.com/Animesh-666/TRIPSYNC/actions/workflows/tests.yml)
+
+🌐 [Live Website](https://tripsync-veye.onrender.com/)
+
+📦 [Latest GitHub Release](https://github.com/Animesh-666/TRIPSYNC/releases/latest)
+
 ## 🌟 Project Overview
 
 **TripSync (Travel Booking Data Organizer)** is a professional web-based reservation management system designed to centralize, organize, track, and analyze travel booking records across four primary categories:
